@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LandInvest - AI Finder</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js"></script>
+</head>
+<body>
+
+<header>
+  <h2>LandInvest</h2>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="listings.html">Listings</a>
+    <a href="ai.html">AI Finder</a>
+    <a href="auth.html">Login</a>
+    <a href="subscription.html">Subscribe</a>
+  </div>
+</header>
+
+<div style="padding:40px;max-width:600px;">
+  <h1>AI Land Finder</h1>
+  <p style="color:#aaa;margin:10px 0 24px;">Enter your budget and we'll find the best ROI land for you.</p>
+
+  <label style="color:#aaa;font-size:13px;">YOUR BUDGET (USD)</label><br>
+  <input id="budget" placeholder="e.g. 1500000" type="number" style="width:100%;margin-bottom:12px;">
+
+  <label style="color:#aaa;font-size:13px;">PRIORITY</label><br>
+  <select id="priority" style="width:100%;padding:8px;background:#111;color:white;border:1px solid #222;margin-bottom:16px;">
+    <option value="roi">Highest ROI</option>
+    <option value="growth">Highest Growth</option>
+    <option value="risk">Lowest Risk</option>
+    <option value="location">Best Location</option>
+  </select>
+
+  <button onclick="find()" style="width:100%;">Find Best Match</button>
+
+  <div id="res" style="margin-top:24px;"></div>
+</div>
+
+<script>
+  function find() {
+    const sub = localStorage.getItem("subscribed");
+    if (!sub) {
+      if (confirm("Subscribe to use AI Finder. Go to subscription page?")) {
+        window.location = "subscription.html";
+      }
+      return;
+    }
+
+    const budget = parseFloat(document.getElementById("budget").value);
+    const priority = document.getElementById("priority").value;
+
+    if (!budget || budget <= 0) {
+      document.getElementById("res").innerHTML = `<p style="color:#f66;">Please enter a valid budget.</p>`;
+      return;
+    }
+
+    const filtered = data.filter(d => d.price <= budget);
+
+    if (filtered.length === 0) {
+      document.getElementById("res").innerHTML = `<p style="color:#f66;">No properties found within your budget of $${budget.toLocaleString()}.</p>`;
+      return;
+    }
+
+    const best = filtered.sort((a, b) => b[priority] - a[priority])[0];
+
+    function score(d) {
+      return Math.round(d.location*0.25 + d.growth*0.20 + d.roi*0.20 + d.risk*0.15 + d.liquidity*0.10 + d.infrastructure*0.10);
+    }
+
+    document.getElementById("res").innerHTML = `
+      <div class="card">
+        <p style="color:#4da3ff;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">Best Match</p>
+        <h2 style="margin:8px 0;">${best.title}</h2>
+        <p style="color:#aaa;margin-bottom:8px;">${best.country} · $${best.price.toLocaleString()}</p>
+        <p style="color:#ccc;line-height:1.7;margin-bottom:16px;">${best.thesis}</p>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px;">
+          <div><div style="color:#aaa;font-size:11px;">ROI</div><div style="color:#4da3ff;font-size:20px;font-weight:bold;">${best.roi}</div></div>
+          <div><div style="color:#aaa;font-size:11px;">GROWTH</div><div style="color:#4da3ff;font-size:20px;font-weight:bold;">${best.growth}</div></div>
+          <div><div style="color:#aaa;font-size:11px;">SCORE</div><div style="color:#4da3ff;font-size:20px;font-weight:bold;">${score(best)}</div></div>
+        </div>
+        <button onclick="localStorage.setItem('id',${data.indexOf(best)});window.location='detail.html'">View Full Detail</button>
+      </div>`;
+  }
+</script>
+
+</body>
+</html>

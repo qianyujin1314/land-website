@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LandInvest - Login / Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h2>LandInvest</h2>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="listings.html">Listings</a>
+    <a href="ai.html">AI Finder</a>
+    <a href="subscription.html">Subscribe</a>
+  </div>
+</header>
+
+<div style="max-width:400px;margin:80px auto;padding:0 20px;text-align:center;">
+
+  <!-- Tabs -->
+  <div style="display:flex;margin-bottom:24px;border:1px solid #222;">
+    <button id="tab-login" onclick="showTab('login')"
+      style="flex:1;padding:12px;background:#4da3ff;border:none;color:white;cursor:pointer;">
+      Login
+    </button>
+    <button id="tab-register" onclick="showTab('register')"
+      style="flex:1;padding:12px;background:#111;border:none;color:#aaa;cursor:pointer;">
+      Register
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <div id="form-login">
+    <h2 style="margin-bottom:20px;">Welcome Back</h2>
+    <input id="login-email" placeholder="Email" type="email" style="display:block;width:100%;"><br>
+    <input id="login-pass" placeholder="Password" type="password" style="display:block;width:100%;"><br>
+    <button onclick="log()" style="width:100%;margin-top:8px;">Login</button>
+    <div id="login-msg" style="margin-top:12px;font-size:13px;"></div>
+  </div>
+
+  <!-- Register Form -->
+  <div id="form-register" style="display:none;">
+    <h2 style="margin-bottom:20px;">Create Account</h2>
+    <input id="reg-email" placeholder="Email" type="email" style="display:block;width:100%;"><br>
+    <input id="reg-pass" placeholder="Password" type="password" style="display:block;width:100%;"><br>
+    <button onclick="reg()" style="width:100%;margin-top:8px;">Register</button>
+    <div id="reg-msg" style="margin-top:12px;font-size:13px;"></div>
+  </div>
+
+  <!-- Status -->
+  <div id="user-status" style="margin-top:24px;padding:16px;background:#111;border:1px solid #222;display:none;">
+    <p id="user-label" style="color:#4da3ff;margin-bottom:12px;"></p>
+    <button onclick="logout()" style="background:#333;width:100%;">Logout</button>
+  </div>
+
+</div>
+
+<script>
+  // Show correct tab
+  function showTab(tab) {
+    document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('tab-login').style.background = tab === 'login' ? '#4da3ff' : '#111';
+    document.getElementById('tab-login').style.color = tab === 'login' ? 'white' : '#aaa';
+    document.getElementById('tab-register').style.background = tab === 'register' ? '#4da3ff' : '#111';
+    document.getElementById('tab-register').style.color = tab === 'register' ? 'white' : '#aaa';
+  }
+
+  // Register
+  function reg() {
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    const msg = document.getElementById('reg-msg');
+    if (!email || !pass) { msg.style.color='#f66'; msg.textContent='Please fill in all fields.'; return; }
+    if (localStorage.getItem(email)) { msg.style.color='#f66'; msg.textContent='Email already registered.'; return; }
+    localStorage.setItem(email, pass);
+    msg.style.color = '#4da3ff';
+    msg.textContent = 'Registered! You can now login.';
+    setTimeout(() => showTab('login'), 1200);
+  }
+
+  // Login
+  function log() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const msg = document.getElementById('login-msg');
+    if (!email || !pass) { msg.style.color='#f66'; msg.textContent='Please fill in all fields.'; return; }
+    if (localStorage.getItem(email) !== pass) { msg.style.color='#f66'; msg.textContent='Invalid email or password.'; return; }
+    localStorage.setItem('user', email);
+    msg.style.color = '#4da3ff';
+    msg.textContent = 'Login successful! Redirecting...';
+    setTimeout(() => window.location = 'index.html', 1000);
+  }
+
+  // Logout
+  function logout() {
+    localStorage.removeItem('user');
+    document.getElementById('user-status').style.display = 'none';
+    document.getElementById('form-login').style.display = 'block';
+  }
+
+  // Check if already logged in
+  const user = localStorage.getItem('user');
+  if (user) {
+    document.getElementById('form-login').style.display = 'none';
+    document.getElementById('form-register').style.display = 'none';
+    document.getElementById('tab-login').style.display = 'none';
+    document.getElementById('tab-register').style.display = 'none';
+    const status = document.getElementById('user-status');
+    status.style.display = 'block';
+    document.getElementById('user-label').textContent = 'Logged in as: ' + user;
+  }
+</script>
+
+</body>
+</html>

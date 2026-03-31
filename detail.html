@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Land Detail</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="data.js"></script>
+    <!-- jsPDF 库，用于 GPT 报告 PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- 功能 JS -->
+    <script src="gpt-report.js"></script>
+    <script src="email.js"></script>
+    <script src="seo.js"></script>
+</head>
+<body>
+<div id="detail"></div>
+<!-- 邮件发送输入 -->
+<div style="margin:20px;">
+    <input type="email" id="user-email" placeholder="Enter your email">
+    <button onclick="sendReport()">Send Report via Email</button>
+</div>
+<!-- SEO文章生成 -->
+<div style="margin:20px;">
+    <h2>Generate SEO Article</h2>
+    <select id="seo-country">
+        <option>USA</option>
+        <option>UAE</option>
+        <option>Ukraine</option>
+    </select>
+    <select id="seo-lang">
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+    </select>
+    <button onclick="generateSEO()">Generate SEO Article</button>
+    <div id="seo-article" style="margin-top:10px;"></div>
+</div>
+<script>
+let item = data[localStorage.getItem("id")];
+// 投资评分函数
+function score(d){
+    return Math.round(d.location*0.25 + d.growth*0.2 + d.roi*0.2 + d.risk*0.15 + d.liquidity*0.1 + d.infrastructure*0.1);
+}
+// 渲染详情卡
+document.getElementById("detail").innerHTML=`
+<div class="card">
+<h1>${item.title}</h1>
+<p>${item.country}</p >
+<p>$${item.price}</p >
+<h2>Score: ${score(item)}</h2>
+<p>${item.thesis}</p >
+<button onclick="ai()">AI Investment Report</button>
+<button onclick="generateReport(item)">Generate GPT PDF</button>
+</div>`;
+// AI按钮（原来的）
+function ai(){
+    let subscribed = localStorage.getItem("subscribed");
+    if(!subscribed){alert("Subscribe to access AI report"); return;}
+    // 调用 GPT PDF
+    generateReport(item);
+}
+// 邮件发送
+function sendReport(){
+    let email = document.getElementById("user-email").value;
+    if(!email){alert("Please enter your email"); return;}
+    sendReportByEmail(item, email);
+}
+// SEO文章生成
+async function generateSEO(){
+    let country = document.getElementById("seo-country").value;
+    let lang = document.getElementById("seo-lang").value;
+    let article = await generateSEOArticle(country, lang);
+    document.getElementById("seo-article").innerText = article;
+}
+</script>
+</body>
+</html>
