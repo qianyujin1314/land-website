@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>YuanYu Land Platform</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet"/>
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="data.js"></script>
+<style>
+body {
+  margin:0;
+  font-family: "Segoe UI", Arial;
+  background:#f4f7fb;
+}
+/* 布局 */
+.container {
+  display:flex;
+  height:100vh;
+}
+/* 左侧 */
+.sidebar {
+  width:32%;
+  background:#ffffff;
+  overflow:auto;
+  padding:15px;
+  border-right:1px solid #e6ecf2;
+}
+/* 标题 */
+.title {
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:10px;
+  color:#333;
+}
+/* 卡片 */
+.card {
+  background:#ffffff;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:12px;
+  cursor:pointer;
+  border:1px solid #eef2f7;
+  transition:0.2s;
+}
+.card:hover {
+  background:#f0fbff;
+  transform:translateY(-2px);
+}
+/* 地图 */
+#map {
+  width:68%;
+}
+/* 标签 */
+.tag {
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:12px;
+  background:#e8f8ff;
+  color:#00aaff;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 左侧 -->
+  <div class="sidebar">
+    <div class="title">YuanYu 投资地块</div>
+    <div id="list"></div>
+  </div>
+  <!-- 地图 -->
+  <div id="map"></div>
+</div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidWtyYWluZXl1YW55dSIsImEiOiJjbW5nMmhyMXAwMmZlMnJzNms2ODdwYm1tIn0.A7msyPlaFxnphtVny0QkoA';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v11',
+  center: [30.338944, 50.345417],
+  zoom: 13
+});
+map.addControl(new mapboxgl.NavigationControl());
+// 渲染列表
+const list = document.getElementById("list");
+projects.forEach(p => {
+  const el = document.createElement("div");
+  el.className = "card";
+  el.innerHTML = `
+    <h3>${p.name}</h3>
+    <p>${p.price}</p>
+    <span class="tag">${p.area}</span>
+  `;
+  el.onclick = () => {
+    map.flyTo({ center:[p.lng,p.lat], zoom:15 });
+  };
+  list.appendChild(el);
+});
+// 地块
+map.on('load', () => {
+  projects.forEach(p => {
+    map.addSource("land-"+p.id, {
+      type:"geojson",
+      data:p.geojson
+    });
+    map.addLayer({
+      id:"fill-"+p.id,
+      type:"fill",
+      source:"land-"+p.id,
+      paint:{
+        "fill-color":"#66d9ff",
+        "fill-opacity":0.4
+      }
+    });
+    map.addLayer({
+      id:"border-"+p.id,
+      type:"line",
+      source:"land-"+p.id,
+      paint:{
+        "line-color":"#00c3ff",
+        "line-width":2
+      }
+    });
+    map.on('click',"fill-"+p.id,(e)=>{
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(`
+          <h3>${p.name}</h3>
+          <p>${p.price}</p>
+          <button onclick="window.location='detail.html'">查看详情</button>
+        `)
+        .addTo(map);
+    });
+  });
+});
+</script>
+</body>
+</html>
