@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>项目详情</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#f4f7fb;
+  padding:20px;
+}
+
+.container {
+  max-width:800px;
+  margin:auto;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+}
+
+h1 { color:#333; }
+.tag {
+  background:#e8f8ff;
+  padding:5px 10px;
+  border-radius:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="detail"></div>
+
+<script>
+const data = JSON.parse(localStorage.getItem("project"));
+
+const div = document.getElementById("detail");
+
+div.innerHTML = `
+  <h1>${data.name}</h1>
+  <p>价格: ${data.price}</p>
+  <p>面积: ${data.area}</p>
+  <span class="tag">AI评分: 85</span>
+`;
+</script>
+
+</body>
+</html>
