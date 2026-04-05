@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>基辅塔拉西夫卡一号地 | Kyiv Oblast 数据室</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet"/>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css"/>
+<link rel="stylesheet" href="style.css"/>
+<script src="data.js"></script>
+<script src="js/seo.js"></script>
+<script src="js/i18n.js"></script>
+</head>
+<body class="page-home">
+<header class="site-header site-header--glass">
+  <a href="index.html" class="brand">YuanYu Land<small data-i18n="brandSub">基辅州 · 塔拉西夫卡 · 仅单一宗地</small></a>
+  <nav class="nav">
+    <a href="index.html" class="active">首页</a>
+    <a href="listings.html">列表</a>
+    <a href="detail.html?id=1">详情</a>
+    <a href="ai.html">AI 报告</a>
+    <a href="pitchdeck.html">投资人</a>
+    <a href="subscription.html">订阅</a>
+    <a href="auth.html">登录</a>
+    <label class="lang-wrap">
+      <span class="sr-only">Language</span>
+      <select id="lang-select" class="lang-select" aria-label="Language">
+        <option value="zh">中文</option>
+        <option value="en">EN</option>
+      </select>
+    </label>
+  </nav>
+</header>
+
+<div class="home-map-shell">
+  <div class="map-stage">
+    <main id="map-main" class="map-main-full" aria-label="Mapbox Kyiv"></main>
+    <div class="map-scanlines" aria-hidden="true"></div>
+
+    <div class="map-video-pip" id="map-video-pip">
+      <span class="pip-label" data-i18n="mapBadge">实地影像 / 航拍</span>
+      <video id="hero-video" class="pip-video" muted loop playsinline preload="metadata" poster="">
+        <source src="aerial.mp4" type="video/mp4"/>
+      </video>
+      <p class="pip-fallback" id="pip-fallback">将 aerial.mp4 置于站点根目录即可画中画叠加</p>
+    </div>
+
+    <div class="map-overlay-hero glass-panel">
+      <h1 class="hero-map-title" data-i18n="heroTitle">基辅圈 · 一号地数据室</h1>
+      <p class="hero-map-lead" data-i18n="heroLead">非全球资产库：仅乌克兰基辅州塔拉西夫卡村 1.352 ha。</p>
+      <div class="hero-map-actions">
+        <a class="btn btn-glow primary" href="detail.html?id=1" data-i18n="ctaRoom">进入 Data Room</a>
+        <a class="btn btn-glow" href="ai.html" data-i18n="ctaAi">AI 全量报告</a>
+      </div>
+      <p class="hero-micro">Kyiv Oblast bbox · Mapbox GL JS · fog + DEM · 单宗地 GeoJSON</p>
+    </div>
+
+    <aside class="map-sidebar glass-panel">
+      <div class="sidebar-head">
+        <span class="badge-live"><span class="pulse"></span> Kyiv-only</span>
+        <h3 id="side-title">—</h3>
+        <p class="meta" id="side-price">—</p>
+      </div>
+      <div class="kpis kpis--compact">
+        <div class="kpi"><div class="label" data-i18n="kpiScore">综合评分</div><div class="value" id="kpiScore">--</div></div>
+        <div class="kpi"><div class="label" data-i18n="kpiRoi">模型 ROI</div><div class="value" id="kpiRoi">--</div></div>
+      </div>
+      <div class="mini"><span class="pulse"></span><span id="liveText" data-i18n="live">智能看板</span></div>
+      <div class="mini" id="coordText">—</div>
+      <div class="mini" id="infraText">—</div>
+      <div class="mini" id="highlightText">—</div>
+      <div class="toolbox toolbox--floating">
+        <div class="quick-actions">
+          <button type="button" class="btn btn-sm" id="toggleHeat" data-i18n="heat">热力</button>
+          <button type="button" class="btn btn-sm" id="toggleTerrain" data-i18n="terrain">3D 地形</button>
+          <button type="button" class="btn btn-sm" id="toggleBasemap" data-i18n="basemap">底图</button>
+          <button type="button" class="btn btn-sm" id="fitAll" data-i18n="fit">视野全览</button>
+        </div>
+        <button type="button" class="btn btn-sm btn-block" id="startMeasure" data-i18n="measure">测距</button>
+        <a class="btn btn-sm primary btn-block" href="detail.html?id=1"><span data-i18n="ctaRoom">Data Room</span></a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<section class="section section--dark home-platform">
+  <h2 class="section-title" data-i18n="platformTitle">从信息到落地：三层能力</h2>
+  <div class="grid-3">
+    <article class="card card--glass">
+      <h3 data-i18n="tier1t">门户层 · 免费</h3>
+      <p class="meta" data-i18n="tier1d">单宗地公开摘要、动态地图与政策风险提示。</p>
+    </article>
+    <article class="card card--glass">
+      <h3 data-i18n="tier2t">协作层 · 订阅</h3>
+      <p class="meta" data-i18n="tier2d">PDF / 邮件、顾问队列、尽调清单与情景分析。</p>
+    </article>
+    <article class="card card--glass">
+      <h3 data-i18n="tier3t">AI 套件 · 可扩展</h3>
+      <p class="meta" data-i18n="tier3d">全量报告、敏感性表、法律清单；可对接 GPT API 与私有 PDF。</p>
+    </article>
+  </div>
+  <p class="compare-line" data-i18n="compareNote"></p>
+</section>
+
+<footer class="footer footer--dark">© YuanYu Land · Kyiv Oblast · с. Тарасівка Lot 1 · 仅供参考</footer>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<script src="js/kyiv-map-home.js"></script>
+<script>
+applySeo(typeof LAND !== "undefined" ? LAND : projects[0]);
+
+(function () {
+  const vid = document.getElementById("hero-video");
+  const pip = document.getElementById("map-video-pip");
+  const fallback = document.getElementById("pip-fallback");
+  if (vid) {
+    vid.addEventListener("error", () => {
+      pip.classList.add("pip-error");
+    });
+    vid.addEventListener("loadeddata", () => {
+      fallback.style.display = "none";
+      vid.play().catch(() => {});
+    });
+  }
+})();
+
+function updateInsightPanel(project) {
+  if (!project) return;
+  document.getElementById("side-title").textContent = project.name;
+  document.getElementById("side-price").textContent = project.price + " · " + (project.area || "");
+  document.getElementById("kpiScore").textContent = (project.score || 80) + " / 100";
+  document.getElementById("kpiRoi").textContent = project.roi || "—";
+  document.getElementById("coordText").textContent =
+    (yyLang() === "en" ? "GPS: " : "坐标: ") + (project.coordText || `${project.lat.toFixed(5)}, ${project.lng.toFixed(5)}`);
+  document.getElementById("infraText").textContent =
+    (yyLang() === "en" ? "Infrastructure: " : "配套: ") +
+    (project.infra ? `${project.infra.medical}；${project.infra.transport}` : "—");
+  document.getElementById("highlightText").textContent =
+    (yyLang() === "en" ? "Highlight: " : "亮点: ") +
+    (project.highlights && project.highlights.length ? project.highlights[0] : "—");
+}
+
+function startDynamicTicker() {
+  setInterval(() => {
+    const p = projects[0];
+    if (!p) return;
+    const jitter = (Math.random() * 1.6 - 0.8).toFixed(1);
+    const heat = (72 + Math.random() * 18).toFixed(0);
+    const liveEl = document.getElementById("liveText");
+    if (!liveEl) return;
+    liveEl.textContent = `${p.name} | heat ${heat} | Δ ${jitter > 0 ? "+" : ""}${jitter}%`;
+  }, 2400);
+}
+
+const MAP_TOKEN = "pk.eyJ1IjoidWtyYWluZXl1YW55dSIsImEiOiJjbW5nMmhyMXAwMmZlMnJzNms2ODdwYm1tIn0.A7msyPlaFxnphtVny0QkoA";
+
+const homeApi = window.initKyivHomeMap({
+  containerId: "map-main",
+  accessToken: MAP_TOKEN,
+  projects: projects,
+  land: projects[0],
+  geocoderPlaceholder: "Search Kyiv Oblast…",
+  onSelect: updateInsightPanel,
+  onReady: function () {
+    updateInsightPanel(projects[0]);
+    startDynamicTicker();
+  }
+});
+
+if (homeApi) {
+document.getElementById("fitAll").addEventListener("click", () => homeApi.fitProjects());
+document.getElementById("toggleHeat").addEventListener("click", () => homeApi.toggleHeat());
+document.getElementById("toggleTerrain").addEventListener("click", () => homeApi.toggleTerrain());
+document.getElementById("toggleBasemap").addEventListener("click", () => homeApi.toggleBasemap());
+}
+document.getElementById("startMeasure").addEventListener("click", () => {
+  alert(yyLang() === "en" ? "Use draw tools (top-right) to create a line." : "使用右上角绘图工具画折线，结束后自动显示公里数。");
+});
+
+window.addEventListener("yy-lang", () => updateInsightPanel(projects[0]));
+</script>
+</body>
+</html>

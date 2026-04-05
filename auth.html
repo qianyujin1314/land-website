@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>登录 / 注册</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="data.js"></script>
+<script src="js/seo.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="brand">YuanYu Land<small>Account</small></a>
+  <nav class="nav">
+    <a href="index.html">首页</a>
+    <a href="listings.html">列表</a>
+    <a href="detail.html?id=1">详情</a>
+    <a href="ai.html">AI 报告</a>
+    <a href="subscription.html">订阅</a>
+    <a href="auth.html" class="active">登录</a>
+  </nav>
+</header>
+
+<div class="auth-box">
+  <h2 style="margin-top:0;">登录</h2>
+  <label>邮箱</label>
+  <input type="email" id="login-email" placeholder="you@company.com" autocomplete="username"/>
+  <label>密码</label>
+  <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+  <button type="button" class="btn primary" style="width:100%;margin-top:12px;" id="btn-login">登录（本地演示）</button>
+  <p class="meta" style="margin-top:12px;">正式环境对接 <code>server.js</code> 或 OAuth。</p>
+</div>
+
+<div class="auth-box">
+  <h2 style="margin-top:0;">注册</h2>
+  <label>邮箱</label>
+  <input type="email" id="reg-email" placeholder="you@company.com"/>
+  <label>密码</label>
+  <input type="password" id="reg-pass" placeholder="至少 8 位"/>
+  <button type="button" class="btn primary" style="width:100%;margin-top:12px;" id="btn-reg">注册并保存到本地</button>
+</div>
+
+<footer class="footer">© YuanYu Land</footer>
+<script>
+  applySeo(LAND);
+  document.getElementById("btn-login").addEventListener("click", () => {
+    const email = document.getElementById("login-email").value.trim();
+    const user = { email, at: Date.now() };
+    localStorage.setItem("yy_user", JSON.stringify(user));
+    alert("登录成功（演示）：已写入 localStorage");
+    window.location.href = "index.html";
+  });
+  document.getElementById("btn-reg").addEventListener("click", () => {
+    const email = document.getElementById("reg-email").value.trim();
+    localStorage.setItem("yy_user", JSON.stringify({ email, at: Date.now() }));
+    alert("注册成功（演示）");
+  });
+</script>
+</body>
+</html>

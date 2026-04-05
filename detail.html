@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>项目详情 | 塔拉西夫卡一号地</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<script src="data.js"></script>
+<script src="js/seo.js"></script>
+<style>
+.report-toolbar { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+#report-host { margin-top: 16px; padding: 16px; background: #fafcff; border: 1px solid var(--line); border-radius: 12px; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="brand">YuanYu Land<small>Investment Data Room</small></a>
+  <nav class="nav">
+    <a href="index.html">首页</a>
+    <a href="listings.html">列表</a>
+    <a href="detail.html?id=1" class="active">详情</a>
+    <a href="ai.html">AI 分析</a>
+    <a href="pitchdeck.html">投资人</a>
+    <a href="subscription.html">订阅</a>
+    <a href="auth.html">登录</a>
+  </nav>
+</header>
+
+<div class="page-title">
+  <h1 id="detail-title">—</h1>
+  <p id="detail-sub">—</p>
+</div>
+
+<section class="section">
+  <div class="kpis" id="kpi-row"></div>
+</section>
+
+<section class="section detail-grid two">
+  <div class="card">
+    <h2>交互地图 · Mapbox</h2>
+    <p class="meta">卫星 / 街道 / 3D 地形切换；地块矢量叠加。</p>
+    <div class="tabs" id="map-style-tabs">
+      <button type="button" class="tab active" data-style="satellite">卫星</button>
+      <button type="button" class="tab" data-style="streets">街道</button>
+      <button type="button" class="tab" id="btn-terrain">3D 地形</button>
+    </div>
+    <div id="detail-map" class="map-embed"></div>
+    <p style="margin-top:12px;"><a id="gmaps-link" class="btn" href="#" target="_blank" rel="noopener">在 Google 地图中打开</a></p>
+  </div>
+  <div class="card prose">
+    <h2>标的摘要</h2>
+    <ul id="highlights"></ul>
+    <h3 style="margin-top:16px;">报告说明</h3>
+    <p id="report-note" class="meta"></p>
+    <h3>文件索引</h3>
+    <ul id="doc-list"></ul>
+  </div>
+</section>
+
+<section class="section">
+  <h2>影像与短视频</h2>
+  <p class="meta">将 <code>aerial.mp4</code>、<code>drive.mp4</code> 与网页放在<strong>同一层目录</strong>（仓库根目录）上传即可；入屏自动播放（静音循环），滑走即停。仍支持 <code>kind: "youtube"</code> 或 <code>src</code> 填完整 https 链接。</p>
+  <div class="video-grid" id="video-grid"></div>
+</section>
+
+<section class="section detail-grid two">
+  <div class="card prose">
+    <h2>配套与基础设施</h2>
+    <ul id="infra-list"></ul>
+  </div>
+  <div class="card prose">
+    <h2>周边市场（摘要）</h2>
+    <ul id="market-list"></ul>
+  </div>
+</section>
+
+<section class="section">
+  <h2>GPT 投资报告 · 生成 PDF</h2>
+  <p class="meta">客户端模板生成；接入 OpenAI 后可扩写法规、税务与敏感性分析。</p>
+  <div class="report-toolbar">
+    <button type="button" class="btn primary" id="btn-gen-report">生成报告预览</button>
+    <button type="button" class="btn" id="btn-pdf">下载 PDF</button>
+    <button type="button" class="btn" id="btn-email">邮件发送（mailto）</button>
+  </div>
+  <div id="report-host"></div>
+</section>
+
+<footer class="footer">© YuanYu Land · 详情页含地图与可下载报告</footer>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="js/ai-engine.js"></script>
+<script src="js/gpt-report.js"></script>
+<script src="js/email.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const land = getLandById(params.get("id") || 1);
+  applySeo(land);
+
+  document.getElementById("detail-title").textContent = land.name;
+  document.getElementById("detail-sub").textContent = land.nameEn + " · " + land.coordText;
+  document.getElementById("report-note").textContent = land.reportNote;
+  document.getElementById("gmaps-link").href = land.googleMapsUrl;
+
+  document.getElementById("kpi-row").innerHTML = [
+    { label: "面积", value: land.area },
+    { label: "评分", value: land.score + " / 100" },
+    { label: "ROI", value: land.roi },
+    { label: "价格带", value: land.price }
+  ].map(k => `<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div></div>`).join("");
+
+  document.getElementById("highlights").innerHTML = (land.highlights || []).map(h => `<li>${h}</li>`).join("");
+  const inf = land.infra || {};
+  document.getElementById("infra-list").innerHTML = Object.keys(inf).map(k => `<li><strong>${k}</strong>：${inf[k]}</li>`).join("");
+  const mk = land.market || {};
+  document.getElementById("market-list").innerHTML = Object.keys(mk).map(k => `<li><strong>${k}</strong>：${mk[k]}</li>`).join("");
+  document.getElementById("doc-list").innerHTML = (land.documents || []).map(d => `<li>${d.label}（${d.type}）</li>`).join("");
+
+  const vg = document.getElementById("video-grid");
+  (land.videos || []).forEach((v) => {
+    const col = document.createElement("div");
+    col.className = "video-card";
+    const title = document.createElement("h3");
+    title.className = "video-card-title";
+    title.textContent = v.title;
+    const note = document.createElement("p");
+    note.className = "video-card-note";
+    note.textContent = v.note || "";
+
+    const isYoutube = v.kind === "youtube" || (v.youtubeId && v.kind !== "file");
+    const isFile = v.kind === "file" || (v.src && !isYoutube);
+
+    if (isFile && v.src) {
+      const outer = document.createElement("div");
+      outer.className = "video-wrap video-wrap--native";
+      const badge = document.createElement("span");
+      badge.className = "video-live-badge";
+      badge.textContent = "预览";
+      const vid = document.createElement("video");
+      vid.className = "video-native";
+      vid.setAttribute("playsinline", "");
+      vid.setAttribute("muted", "");
+      vid.muted = true;
+      vid.loop = true;
+      vid.preload = "metadata";
+      if (v.poster) vid.poster = v.poster;
+      const source = document.createElement("source");
+      source.src = v.src;
+      source.type = "video/mp4";
+      vid.appendChild(source);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "video-sound-btn";
+      btn.textContent = "开声音";
+      btn.addEventListener("click", () => {
+        vid.muted = !vid.muted;
+        btn.textContent = vid.muted ? "开声音" : "静音";
+        vid.play().catch(() => {});
+      });
+      outer.appendChild(badge);
+      outer.appendChild(vid);
+      outer.appendChild(btn);
+      col.appendChild(title);
+      col.appendChild(note);
+      col.appendChild(outer);
+      vg.appendChild(col);
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) {
+              vid.play().catch(() => {});
+            } else {
+              vid.pause();
+            }
+          });
+        },
+        { threshold: 0.35 }
+      );
+      io.observe(outer);
+    } else if (v.youtubeId) {
+      col.appendChild(title);
+      col.appendChild(note);
+      const box = document.createElement("div");
+      box.className = "video-wrap";
+      box.innerHTML = `<iframe src="https://www.youtube.com/embed/${v.youtubeId}" title="${v.title}" allowfullscreen></iframe>`;
+      col.appendChild(box);
+      vg.appendChild(col);
+    } else {
+      col.appendChild(title);
+      note.textContent = (v.note || "") + "（未配置 src 或 youtubeId）";
+      col.appendChild(note);
+      vg.appendChild(col);
+    }
+  });
+
+  mapboxgl.accessToken = "pk.eyJ1IjoidWtyYWluZXl1YW55dSIsImEiOiJjbW5nMmhyMXAwMmZlMnJzNms2ODdwYm1tIn0.A7msyPlaFxnphtVny0QkoA";
+  let terrainOn = false;
+  const map = new mapboxgl.Map({
+    container: "detail-map",
+    style: "mapbox://styles/mapbox/satellite-streets-v12",
+    center: [land.lng, land.lat],
+    zoom: 14,
+    pitch: 45,
+    bearing: -17
+  });
+  map.addControl(new mapboxgl.NavigationControl());
+  map.addControl(new mapboxgl.FullscreenControl());
+
+  map.on("load", () => {
+    map.addSource("lot", { type: "geojson", data: land.geojson });
+    map.addLayer({
+      id: "lot-fill",
+      type: "fill",
+      source: "lot",
+      paint: { "fill-color": "#00a3ff", "fill-opacity": 0.45 }
+    });
+    map.addLayer({
+      id: "lot-line",
+      type: "line",
+      source: "lot",
+      paint: { "line-color": "#fff", "line-width": 2 }
+    });
+    if (!map.getSource("mapbox-dem")) {
+      map.addSource("mapbox-dem", {
+        type: "raster-dem",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+        tileSize: 512,
+        maxzoom: 14
+      });
+    }
+  });
+
+  document.querySelectorAll("#map-style-tabs .tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#map-style-tabs .tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      if (btn.id === "btn-terrain") {
+        terrainOn = !terrainOn;
+        if (terrainOn) {
+          map.setTerrain({ source: "mapbox-dem", exaggeration: 1.4 });
+        } else {
+          map.setTerrain(null);
+        }
+        return;
+      }
+      const st = btn.dataset.style;
+      if (st === "satellite") {
+        map.setStyle("mapbox://styles/mapbox/satellite-streets-v12");
+      } else if (st === "streets") {
+        map.setStyle("mapbox://styles/mapbox/streets-v12");
+      }
+      map.once("style.load", () => {
+        map.addSource("lot", { type: "geojson", data: land.geojson });
+        map.addLayer({
+          id: "lot-fill",
+          type: "fill",
+          source: "lot",
+          paint: { "fill-color": "#00a3ff", "fill-opacity": 0.45 }
+        });
+        map.addLayer({
+          id: "lot-line",
+          type: "line",
+          source: "lot",
+          paint: { "line-color": "#fff", "line-width": 2 }
+        });
+        if (!map.getSource("mapbox-dem")) {
+          map.addSource("mapbox-dem", {
+            type: "raster-dem",
+            url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+            tileSize: 512,
+            maxzoom: 14
+          });
+        }
+      });
+    });
+  });
+
+  document.getElementById("btn-gen-report").addEventListener("click", () => {
+    renderReportInto("report-host", land);
+  });
+  document.getElementById("btn-pdf").addEventListener("click", () => {
+    const host = document.getElementById("report-host");
+    if (!host.innerHTML.trim()) {
+      renderReportInto("report-host", land);
+    }
+    const inner = host.querySelector("#gpt-report-root") || host;
+    exportReportToPdf(inner, "Tarasivka-Lot-1-Report.pdf");
+  });
+  document.getElementById("btn-email").addEventListener("click", () => {
+    const text = (document.getElementById("report-host").innerText || "").slice(0, 12000);
+    sendInvestmentReportEmail(land, text);
+  });
+</script>
+</body>
+</html>

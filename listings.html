@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>资产列表 | 塔拉西夫卡一号地</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="data.js"></script>
+<script src="js/seo.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="brand">YuanYu Land<small>Kyiv · Tarasivka</small></a>
+  <nav class="nav">
+    <a href="index.html">首页</a>
+    <a href="listings.html" class="active">列表</a>
+    <a href="detail.html?id=1">详情</a>
+    <a href="ai.html">AI 分析</a>
+    <a href="pitchdeck.html">投资人</a>
+    <a href="subscription.html">订阅</a>
+    <a href="auth.html">登录</a>
+  </nav>
+</header>
+
+<div class="page-title">
+  <h1>精选资产</h1>
+  <p>当前正式上架：基辅州塔拉西夫卡村一号地（单一标的深度运营）</p>
+</div>
+
+<section class="section">
+  <div class="grid-3">
+    <article class="card" style="grid-column:1/-1;max-width:720px;">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+        <span class="tag" style="background:#ecfdf5;color:#047857;">Kyiv Oblast only</span>
+        <span class="tag" style="background:#eff6ff;color:#1d4ed8;">Mapbox 数据室</span>
+        <span class="tag" style="background:#fff7ed;color:#c2410c;">AI 十章节报告</span>
+      </div>
+      <h3 id="card-title">—</h3>
+      <p class="meta" id="card-meta">—</p>
+      <p><span class="tag" id="card-area"></span><span class="tag" id="card-type"></span></p>
+      <p class="meta" style="margin-top:12px;">本站仅上架此单一宗地；非全球资产池。</p>
+      <p style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;">
+        <a class="btn primary" href="detail.html?id=1">Data Room · 地图与 PDF</a>
+        <a class="btn" href="ai.html">生成 AI 报告</a>
+      </p>
+    </article>
+  </div>
+</section>
+
+<footer class="footer">© YuanYu Land · 数据以尽调为准</footer>
+<script>
+  document.getElementById("card-title").textContent = LAND.name;
+  document.getElementById("card-meta").textContent = LAND.price + " · " + LAND.coordText;
+  document.getElementById("card-area").textContent = LAND.area;
+  document.getElementById("card-type").textContent = LAND.type;
+  applySeo(LAND);
+</script>
+</body>
+</html>

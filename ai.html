@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AI 投资报告 | Tarasivka Lot 1 · Kyiv</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="data.js"></script>
+<script src="js/seo.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="brand">YuanYu Land<small>AI Investment Lab · Kyiv Oblast only</small></a>
+  <nav class="nav">
+    <a href="index.html">首页</a>
+    <a href="listings.html">列表</a>
+    <a href="detail.html?id=1">详情</a>
+    <a href="ai.html" class="active">AI 报告</a>
+    <a href="pitchdeck.html">投资人</a>
+    <a href="subscription.html">订阅</a>
+    <a href="auth.html">登录</a>
+  </nav>
+</header>
+
+<div class="page-title">
+  <h1>AI 全量投资研判</h1>
+  <p>基于《一号地项目分析情况》《Звіт с.Тарасівка 29.03.19》交叉索引与结构化字段生成；可对接 GPT API 替换 <code>buildAiReportHtml</code>。</p>
+</div>
+
+<section class="section">
+  <div class="card ai-toolbar">
+    <h2 id="ai-land-name">—</h2>
+    <p class="meta" id="ai-land-brief">—</p>
+    <div class="ai-actions">
+      <button type="button" class="btn primary" id="btn-run-ai">生成 AI 全量报告</button>
+      <button type="button" class="btn" id="btn-reveal">段落动效重播</button>
+      <button type="button" class="btn" id="btn-pdf-ai">下载 PDF</button>
+      <a class="btn" href="detail.html?id=1">Data Room · 地图与 PDF</a>
+    </div>
+    <div class="tabs ai-tabs" id="ai-tabs">
+      <button type="button" class="tab active" data-panel="all">完整报告</button>
+      <button type="button" class="tab" data-panel="exec">执行摘要</button>
+      <button type="button" class="tab" data-panel="risk">风险 / 法律</button>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="card prose ai-output-host" id="ai-output-wrap">
+    <div id="ai-output" class="ai-output-inner">
+      <p class="meta">点击「生成」输出十章节结构：范围声明、执行摘要、标的与 PDF 索引、配套、市场、情景表、敏感性、法律清单、税务、ESG 与结论。</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">© YuanYu Land · AI 输出仅供参考，不构成投资建议</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="js/ai-engine.js"></script>
+<script src="js/gpt-report.js"></script>
+<script>
+  applySeo(LAND);
+  document.getElementById("ai-land-name").textContent = LAND.name;
+  document.getElementById("ai-land-brief").textContent =
+    LAND.area + " · " + LAND.price + " · " + LAND.roi + " · Kyiv Oblast single parcel";
+
+  function applyTabFilter(panel) {
+    const root = document.getElementById("ai-output");
+    if (!root) return;
+    const sections = root.querySelectorAll(".ai-report-section");
+    sections.forEach((sec) => {
+      const h = sec.querySelector("h2");
+      const t = h ? h.textContent : "";
+      let show = true;
+      if (panel === "exec") {
+        show = t.includes("执行摘要") || t.includes("范围声明") || t.includes("0.");
+      }
+      if (panel === "risk") {
+        show =
+          t.includes("风险") ||
+          t.includes("法律") ||
+          t.includes("敏感性") ||
+          t.includes("税务") ||
+          t.includes("ESG");
+      }
+      sec.style.display = show ? "block" : "none";
+    });
+  }
+
+  function renderFull() {
+    const html = buildAiReportHtml(LAND);
+    revealAiReport("ai-output", html);
+    const active = document.querySelector("#ai-tabs .tab.active");
+    if (active) applyTabFilter(active.dataset.panel || "all");
+  }
+
+  document.getElementById("btn-run-ai").addEventListener("click", renderFull);
+
+  document.getElementById("btn-reveal").addEventListener("click", renderFull);
+
+  document.querySelectorAll("#ai-tabs .tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll("#ai-tabs .tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      const panel = tab.dataset.panel || "all";
+      if (document.getElementById("ai-output").querySelector(".ai-report-root")) {
+        applyTabFilter(panel);
+      } else {
+        renderFull();
+      }
+    });
+  });
+
+  document.getElementById("btn-pdf-ai").addEventListener("click", () => {
+    const wrap = document.createElement("div");
+    wrap.innerHTML = buildGptStyleReportHtml(LAND);
+    wrap.style.position = "fixed";
+    wrap.style.left = "-9999px";
+    document.body.appendChild(wrap);
+    const inner = wrap.querySelector("#gpt-report-root") || wrap;
+    exportReportToPdf(inner, "Tarasivka-Lot-1-AI-Report.pdf");
+    setTimeout(() => wrap.remove(), 2500);
+  });
+</script>
+</body>
+</html>

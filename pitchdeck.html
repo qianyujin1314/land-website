@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Investor Pitch | Tarasivka Lot 1</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="data.js"></script>
+<script src="js/seo.js"></script>
+<style>
+.slide {
+  min-height: 72vh;
+  padding: 48px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.slide h2 { font-size: 28px; color: var(--brand); margin: 0 0 16px; }
+.slide p { font-size: 18px; color: var(--muted); max-width: 720px; }
+.big-num { font-size: 56px; font-weight: 800; color: var(--accent); line-height: 1; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a href="index.html" class="brand">YuanYu Land<small>Pitch Deck</small></a>
+  <nav class="nav">
+    <a href="index.html">首页</a>
+    <a href="pitchdeck.html" class="active">投资人</a>
+    <a href="detail.html?id=1">详情</a>
+  </nav>
+</header>
+
+<section class="slide" style="background:linear-gradient(135deg,#f5f7fb,#e8f1ff);">
+  <h2>乌克兰基辅圈 · 塔拉西夫卡一号地</h2>
+  <p id="pitch-lead">—</p>
+  <p><a class="btn primary" href="detail.html?id=1">进入 Data Room</a></p>
+</section>
+
+<section class="slide">
+  <h2>投资逻辑</h2>
+  <p>近郊生态与通勤弹性兼备；独栋市场存在清晰价格带，适合开发与长期持有组合。</p>
+</section>
+
+<section class="slide">
+  <div class="big-num" id="pitch-area">—</div>
+  <h2>土地规模</h2>
+  <p>公顷级宗地，便于分期开发与资金节奏管理。</p>
+</section>
+
+<section class="slide">
+  <h2>下一步</h2>
+  <p>地籍核验 · 规划用途 · 环境与水文 · 融资与退出结构。本平台提供地图、AI 报告与订阅分级。</p>
+  <p><a class="btn" href="subscription.html">查看订阅</a></p>
+</section>
+
+<footer class="footer">Confidential · 仅供合格投资人演示</footer>
+<script>
+  applySeo(LAND);
+  document.getElementById("pitch-lead").textContent =
+    LAND.name + " · " + LAND.area + " · " + LAND.price;
+  document.getElementById("pitch-area").textContent = String(LAND.areaHa || "1.35") + " ha";
+</script>
+</body>
+</html>
